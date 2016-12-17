@@ -60,7 +60,7 @@ public class Client implements NotificationListener {
 
         deadList = new ArrayList<Member>();
 
-        t_gossip = 100; // 1 second TODO: make configurable
+        t_gossip = 1000; // 1 second TODO: make configurable
 
         t_cleanup = 10000; // 10 seconds TODO: make configurable
 
@@ -68,10 +68,16 @@ public class Client implements NotificationListener {
 
         int port = 0;
 
+
         String myIpAddress = InetAddress.getLocalHost().getHostAddress();
         this.myAddress = myIpAddress + ":" + port;
 
+        //System.out.println(">>>>" + myAddress);
+
+
         ArrayList<String> startupHostsList = parseStartupMembers();
+
+
 
         // loop over the initial hosts, and find ourselves
         for (String host : startupHostsList) {
@@ -90,6 +96,7 @@ public class Client implements NotificationListener {
 
         System.out.println("Original Member List");
         System.out.println("---------------------");
+
         for (Member member : memberList) {
             System.out.println(member);
         }
@@ -263,11 +270,13 @@ public class Client implements NotificationListener {
                 try {
                     //XXX: be mindful of this array size for later
                     byte[] buf = new byte[256];
+
                     DatagramPacket p = new DatagramPacket(buf, buf.length);
                     server.receive(p);
 
                     // extract the member arraylist out of the packet
                     // TODO: maybe abstract this out to pass just the bytes needed
+
                     ByteArrayInputStream bais = new ByteArrayInputStream(p.getData());
                     ObjectInputStream ois = new ObjectInputStream(bais);
 
@@ -275,7 +284,8 @@ public class Client implements NotificationListener {
                     if(readObject instanceof ArrayList<?>) {
                         ArrayList<Member> list = (ArrayList<Member>) readObject;
 
-                        System.out.println("Received member list:");
+                        System.out.println("Received member list: ");
+                        System.out.println("from [" + p.getAddress() + "]" );
                         for (Member member : list) {
                             System.out.println(member);
                         }
@@ -352,7 +362,7 @@ public class Client implements NotificationListener {
      * Start the gossip thread and start the receiver thread.
      * @throws InterruptedException
      */
-    private void start() throws InterruptedException {
+    protected void start() throws InterruptedException {
 
         // Start all timers except for me
         for (Member member : memberList) {
@@ -379,11 +389,16 @@ public class Client implements NotificationListener {
         }
     }
 
-    public static void main(String[] args) throws InterruptedException, SocketException, UnknownHostException {
+
+
+
+ public static void main(String[] args) throws InterruptedException, SocketException, UnknownHostException {
 
         Client client = new Client();
         client.start();
     }
+
+
 
     /**
      * All timers associated with a member will trigger this method when it goes

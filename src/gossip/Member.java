@@ -17,11 +17,15 @@ public class Member implements Serializable {
 
     private transient TimeoutTimer timeoutTimer;
 
+
+
     public Member(String address, int heartbeat, Client client, int t_cleanup) {
         this.address = address;
         this.heartbeat = heartbeat;
         this.timeoutTimer = new TimeoutTimer(t_cleanup, client, this);
     }
+
+
 
     public void startTimeoutTimer() {
         this.timeoutTimer.start();
@@ -48,6 +52,7 @@ public class Member implements Serializable {
         return "Member [address=" + address + ", heartbeat=" + heartbeat + "]";
     }
 
+
     /* (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
@@ -59,6 +64,7 @@ public class Member implements Serializable {
                 + ((address == null) ? 0 : address.hashCode());
         return result;
     }
+
 
     /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
