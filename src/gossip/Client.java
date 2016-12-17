@@ -120,6 +120,7 @@ public class Client implements NotificationListener {
      */
     private ArrayList<String> parseStartupMembers() {
         ArrayList<String> startupHostsList = new ArrayList<String>();
+
         File startupConfig = new File("config","startup_members");
 
         try {
@@ -393,6 +394,11 @@ public class Client implements NotificationListener {
 
 
  public static void main(String[] args) throws InterruptedException, SocketException, UnknownHostException {
+
+
+        File_management.teste();
+
+
 
         Client client = new Client();
         client.start();
