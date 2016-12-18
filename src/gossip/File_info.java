@@ -1,19 +1,25 @@
 package gossip;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by MDo on 17/12/16.
  */
-public class File_management {
+public class File_info implements Serializable {
+
+    private static final long serialVersionUID = 8387950590016941525L;
+
+    Member peer;
 
     String version;
+
     int number_of_blocks;
 
     ArrayList<String> file_sections = new ArrayList<String>();
 
-    public File_management( ArrayList<String> f ) {
+    public File_info( ArrayList<String> f ) {
 
         this.version= f.get(0);
         this.number_of_blocks= Integer.parseInt(f.get(1));
@@ -24,11 +30,29 @@ public class File_management {
         }
     }
 
-
-    public String toString(){
-        return "to transfer >\nfile version: " + version + "\n#blocks: " + number_of_blocks + "\nlist of chunks " + file_sections ;
+    public boolean wasMember(){
+        if (peer == null){
+            return false;
+        }
+        return true;
     }
 
+    public Member getPeer() {
+        return peer;
+    }
+
+    public void setPeer(Member peer) {
+        this.peer = peer;
+    }
+
+
+
+
+    public String toString(){
+        return "MEMBER: " + peer +  "\nfile version: " + version + "\n#blocks: " + number_of_blocks + "\nlist of chunks " + file_sections ;
+    }
+
+    //TESTING
     public void getInfoFromFile( String folder ){
         File dir_ = new File( folder );
         File[] cont_ = dir_.listFiles();

@@ -31,6 +31,9 @@ public class Client implements NotificationListener {
 
     private ArrayList<Member> deadList;
 
+
+    private ArrayList<File_info> peersList;
+
     // time interval for sending gossip msg
     // used in MembershipGossiper
     private int t_gossip; //in ms
@@ -70,6 +73,8 @@ public class Client implements NotificationListener {
 
         deadList = new ArrayList<Member>();
 
+        peersList = new ArrayList<File_info>();
+
         //time interval for sending gossip msg
         // 1 second TODO: make configurable
         t_gossip = 1000;
@@ -94,17 +99,27 @@ public class Client implements NotificationListener {
         for (String host : startupHostsList) {
 
             Member member = new Member(host, 0, this, t_cleanup);
+            File_info file_info;
 
             if (host.contains(myIpAddress)) {
                 // save our own Member class so we can increment our heartbeat later
                 me = member;
                 port = Integer.parseInt(host.split(":")[1]);
                 this.myAddress = myIpAddress + ":" + port;
+
+                //////////////////////////////////////////////////////
+                //create a file info for the only i know at this time
+                //add it to peer list
+                file_info = new File_info(parseFileVersion());
+                file_info.setPeer(me);
+                peersList.add(file_info);
+                //////////////////////////////////////////////////////
+
                 System.out.println("ME >> " + me);
+
             }
             memberList.add(member);
         }
-
 
 
         System.out.println("---------------------");
@@ -121,8 +136,10 @@ public class Client implements NotificationListener {
         /////////////////////////
         System.out.println("<<<<<<<<<<<<<<<<<<<<TESTING STUFF>>>>>>>>>>>>>>>>>>>>>");
         //System.out.println(parseFileVersion());
-        File_management n = new File_management(parseFileVersion());
-        System.out.println( n );
+        File_info n = new File_info(parseFileVersion());
+        System.out.println(n);
+        System.out.println("PEERS LIST");
+        System.out.println(peersList);
         System.out.println(">>>>>>>>>>>>>>>>>END OFF TESTING STUFF>>>>>>>>>>>>>>>>>>>>>");
         /////////////////////////
         //END OF TESTING ADDED FUNCS
@@ -181,8 +198,8 @@ public class Client implements NotificationListener {
      * at a newline delimited config file.
      *
      * @return List of [0]<File_Name,
-     *                 [1]#Chuncks,
-     *                 [2]part 1 part 2 ... part n> Strings
+     * [1]#Chuncks,
+     * [2]part 1 part 2 ... part n> Strings
      */
     private ArrayList<String> parseFileVersion() {
         ArrayList<String> startupFile = new ArrayList<String>();
@@ -219,6 +236,7 @@ public class Client implements NotificationListener {
     /**
      * Performs the sending of the membership list, after we have
      * incremented our own heartbeat.
+     * * **************************************************************************
      * REVIEW: define a FANOUT make it so that a random number of peers is chosen
      * this way is faster to propagate the msg
      * REVIEW: define a A MAXIMUM NUMBER OF NODES PER MEMBER_LIST
@@ -319,32 +337,11 @@ public class Client implements NotificationListener {
 
 
 
-
-    /**
-     * Performs the sending of the file version, after we have
-     * incremented our own heartbeat.
-     * REVIEW: this should also have more info about file and people who as it
-     * **************************************************************************
-     * REVIEW: define a FANOUT make it so that a random number of peers is chosen
-     * this way is faster to propagate the msg
-     * REVIEW: define a A MAXIMUM NUMBER OF NODES PER MEMBER_LIST
-     * or else everyone will have a list with the whole network of peers
-     */
-    private void sendFileVersionInfo() {
-
-        synchronized (this.fileInfoList) {
-
-        }
-    }
-
-
-
-
-
     ///////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
     // INNER CLASS >> MembershipGossiper
     ///////////////////////////////////////////////////////////////////////////
+
     /**
      * The class handles gossiping the membership list.
      * This information is important to maintaining a common
@@ -378,6 +375,7 @@ public class Client implements NotificationListener {
         }
 
     }
+
     ///////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
     // END OFF INNER CLASS >> MembershipGossiper
@@ -529,6 +527,8 @@ public class Client implements NotificationListener {
         // Potentially, you could kick off more threads here
         //  that could perform additional data synching
 
+
+
         // keep the main thread around
         while (true) {
             TimeUnit.SECONDS.sleep(10);
@@ -538,7 +538,7 @@ public class Client implements NotificationListener {
 
     public static void main(String[] args) throws InterruptedException, SocketException, UnknownHostException {
 
-        //File_management fl = new File_management("data");
+        //File_info fl = new File_info("data");
         //fl.print_test();
 
 
