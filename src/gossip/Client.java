@@ -31,10 +31,12 @@ public class Client implements NotificationListener {
 
     private ArrayList<Member> deadList;
 
-    //time interval for sending gossip msg
+    // time interval for sending gossip msg
+    // used in MembershipGossiper
     private int t_gossip; //in ms
 
     //time until declaring a member dead
+    //used in TimeoutTimer
     public int t_cleanup; //in ms
 
     private Random random;
@@ -201,8 +203,10 @@ public class Client implements NotificationListener {
     /**
      * Performs the sending of the membership list, after we have
      * incremented our own heartbeat.
-     * TODO: make it so that a random number of peers is chosen
+     * REVIEW: define a FANOUT make it so that a random number of peers is chosen
      * this way is faster to propagate the msg
+     * REVIEW: define a A MAXIMUM NUMBER OF NODES PER MEMBER_LIST
+     * or else everyone will have a list with the whole network of peers
      */
     private void sendMembershipList() {
 
@@ -210,7 +214,7 @@ public class Client implements NotificationListener {
 
         synchronized (this.memberList) {
             try {
-                //get a ramdom member from member list
+                //get a random member from member list
                 //to send my membership Listing
                 Member member = getRandomMember();
 
@@ -298,10 +302,17 @@ public class Client implements NotificationListener {
     }
 
 
+
+
     /**
      * Performs the sending of the file version, after we have
      * incremented our own heartbeat.
-     * TODO this should also have more info about file and people who as it
+     * REVIEW: this should also have more info about file and people who as it
+     * **************************************************************************
+     * REVIEW: define a FANOUT make it so that a random number of peers is chosen
+     * this way is faster to propagate the msg
+     * REVIEW: define a A MAXIMUM NUMBER OF NODES PER MEMBER_LIST
+     * or else everyone will have a list with the whole network of peers
      */
     private void sendFileVersionInfo() {
 
@@ -309,6 +320,8 @@ public class Client implements NotificationListener {
 
         }
     }
+
+
 
 
 
@@ -329,6 +342,7 @@ public class Client implements NotificationListener {
         public MembershipGossiper() {
             this.keepRunning = new AtomicBoolean(true);
         }
+
 
         @Override
         public void run() {
@@ -379,7 +393,7 @@ public class Client implements NotificationListener {
         public void run() {
             while (keepRunning.get()) {
                 try {
-                    //XXX: be mindful of this array size for later
+                    //TODO XXX: be mindful of this array size for later
                     byte[] buf = new byte[256];
 
                     DatagramPacket p = new DatagramPacket(buf, buf.length);
@@ -508,8 +522,8 @@ public class Client implements NotificationListener {
 
     public static void main(String[] args) throws InterruptedException, SocketException, UnknownHostException {
 
-        File_management fl = new File_management("data");
-        fl.print_test();
+        //File_management fl = new File_management("data");
+        //fl.print_test();
 
 
         Client client = new Client();

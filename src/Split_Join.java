@@ -67,7 +67,7 @@ public class Split_Join {
                 if (filename.exists()) {
                     try {
                         bytefileSize = Long.parseLong(args[2]);
-// splitFileSize = Long.parseLong(args[2]);
+//splitFileSize = Long.parseLong(args[2]);
                         splitFileSize = bytefileSize * 1024 * 1024;
 //System.out.println("ByteFileSize" + mBbytefileSize);
                         Split_Join spObj = new Split_Join();
