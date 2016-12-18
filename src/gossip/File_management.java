@@ -8,19 +8,25 @@ import java.util.ArrayList;
  */
 public class File_management {
 
-    String version = new String();
+    String version;
     int number_of_blocks;
+
     ArrayList<String> file_sections = new ArrayList<String>();
 
-    public File_management( String folder ) {
-        getInfoFromFile( folder );
+    public File_management( ArrayList<String> f ) {
+
+        this.version= f.get(0);
+        this.number_of_blocks= Integer.parseInt(f.get(1));
+
+        String[] n_section = f.get(2).split(" ");
+        for(String s : n_section ){
+            this.file_sections.add(s);
+        }
     }
 
 
-
-
-    public void print_test(){
-        System.out.println( "to transfer > file version_ " + version + " n# blocks_ " + number_of_blocks + " list of f names " + file_sections.toString()  );
+    public String toString(){
+        return "to transfer >\nfile version: " + version + "\n#blocks: " + number_of_blocks + "\nlist of chunks " + file_sections ;
     }
 
     public void getInfoFromFile( String folder ){
@@ -43,7 +49,5 @@ public class File_management {
     }
 
     //File startupConfig = new File("config","startup_members");
-
-
 
 }

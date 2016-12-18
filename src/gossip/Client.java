@@ -120,7 +120,9 @@ public class Client implements NotificationListener {
         //TESTING ADDED FUNCS
         /////////////////////////
         System.out.println("<<<<<<<<<<<<<<<<<<<<TESTING STUFF>>>>>>>>>>>>>>>>>>>>>");
-        System.out.println(parseFileVersion());
+        //System.out.println(parseFileVersion());
+        File_management n = new File_management(parseFileVersion());
+        System.out.println( n );
         System.out.println(">>>>>>>>>>>>>>>>>END OFF TESTING STUFF>>>>>>>>>>>>>>>>>>>>>");
         /////////////////////////
         //END OF TESTING ADDED FUNCS
@@ -173,10 +175,14 @@ public class Client implements NotificationListener {
 
     /**
      * In order know which file version we have to compare with others
-     * we read the FILE NAME, the NUMBER OF CHUNCKS and the CHUNKS I HAVE
+     * we read the FILE NAME
+     * the NUMBER OF CHUNCKS
+     * and the CHUNKS I HAVE
      * at a newline delimited config file.
      *
-     * @return List of <File_Name:#Chuncks:part 1 part 2 ... part n> Strings
+     * @return List of [0]<File_Name,
+     *                 [1]#Chuncks,
+     *                 [2]part 1 part 2 ... part n> Strings
      */
     private ArrayList<String> parseFileVersion() {
         ArrayList<String> startupFile = new ArrayList<String>();
@@ -186,8 +192,18 @@ public class Client implements NotificationListener {
         try {
             BufferedReader br = new BufferedReader(new FileReader(startupConfig));
             String line;
+            String file_name;
+            String n_chuncks;
+            String chunks;
             while ((line = br.readLine()) != null) {
-                startupFile.add(line.trim());
+                line = line.trim();
+                file_name = line.split(":")[0];
+                n_chuncks = line.split(":")[1];
+                chunks = line.split(":")[2];
+
+                startupFile.add(file_name);
+                startupFile.add(n_chuncks);
+                startupFile.add(chunks);
             }
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
