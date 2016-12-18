@@ -14,23 +14,11 @@ public class File_management {
     ArrayList<String> file_sections = new ArrayList<String>();
 
     public File_management( String folder ) {
-
-
-    }
-
-    static void teste (){
-
-        File dir_sub=null;
-
-        File dir_ = new File("data");
+        File dir_ = new File( folder );
         File[] cont_ = dir_.listFiles();
 
-        for ( File f : cont_){
-            //System.out.println( f.getName() );
-            version = f.getName();
-            dir_sub = f;
-        };
-
+        File dir_sub=cont_[cont_.length - 1];
+        version = dir_sub.getName();
 
         if ( dir_sub!=null && dir_sub.isDirectory() ){
             File[] cont_sub = dir_sub.listFiles();
@@ -43,9 +31,14 @@ public class File_management {
             number_of_blocks = i;
         }
 
+    }
+
+    public void print_test(){
+
         System.out.println( "to transfer > file version_ " + version + " n# blocks_ " + number_of_blocks + " list of f names " + file_sections.toString()  );
 
     }
+
 
     //File startupConfig = new File("config","startup_members");
 

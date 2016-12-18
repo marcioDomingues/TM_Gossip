@@ -60,7 +60,7 @@ public class Client implements NotificationListener {
 
         deadList = new ArrayList<Member>();
 
-        t_gossip = 1000; // 1 second TODO: make configurable
+        t_gossip = 1000; // 10 second TODO: make configurable
 
         t_cleanup = 10000; // 10 seconds TODO: make configurable
 
@@ -395,8 +395,8 @@ public class Client implements NotificationListener {
 
  public static void main(String[] args) throws InterruptedException, SocketException, UnknownHostException {
 
-
-        File_management.teste();
+        File_management fl = new File_management( "data" );
+        fl.print_test();
 
 
 
