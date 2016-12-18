@@ -25,8 +25,6 @@ import javax.management.Notification;
 import javax.management.NotificationListener;
 
 
-
-
 public class Client implements NotificationListener {
 
     private ArrayList<Member> memberList;
@@ -51,9 +49,9 @@ public class Client implements NotificationListener {
     private ArrayList<String> fileInfoList;
 
 
-
     /**
      * Setup the client's lists, gossiping parameters, and parse the startup config file.
+     *
      * @throws SocketException
      * @throws InterruptedException
      * @throws UnknownHostException
@@ -88,7 +86,6 @@ public class Client implements NotificationListener {
         //System.out.println(">>>>" + myAddress);
 
 
-
         ArrayList<String> startupHostsList = parseStartupMembers();
 
         // loop over the initial hosts, and find ourselves
@@ -96,15 +93,17 @@ public class Client implements NotificationListener {
 
             Member member = new Member(host, 0, this, t_cleanup);
 
-            if(host.contains(myIpAddress)) {
+            if (host.contains(myIpAddress)) {
                 // save our own Member class so we can increment our heartbeat later
                 me = member;
                 port = Integer.parseInt(host.split(":")[1]);
                 this.myAddress = myIpAddress + ":" + port;
-                System.out.println("I am " + me);
+                System.out.println("ME >> " + me);
             }
             memberList.add(member);
         }
+
+
 
         System.out.println("---------------------");
         System.out.println("My Stored Member List");
@@ -126,19 +125,15 @@ public class Client implements NotificationListener {
         /////////////////////////
 
 
-
         System.out.println("---------------------");
         System.out.println("---- NOW STARTING ---");
         System.out.println("---------------------");
 
 
-
-
-        if(port != 0) {
+        if (port != 0) {
             // TODO: starting the server could probably be moved to the constructor of the receiver thread.
             server = new DatagramSocket(port);
-        }
-        else {
+        } else {
             // This is bad, so no need proceeding on
             System.err.println("Could not find myself in startup list >> my IP is: " + myAddress);
             System.exit(-1);
@@ -146,21 +141,21 @@ public class Client implements NotificationListener {
     }
 
 
-
     /**
      * In order to have some membership lists at startup, we read the IP addresses
      * and port at a newline delimited config file.
+     *
      * @return List of <IP address:port> Strings
      */
     private ArrayList<String> parseStartupMembers() {
         ArrayList<String> startupHostsList = new ArrayList<String>();
 
-        File startupConfig = new File("config","startup_members");
+        File startupConfig = new File("config", "startup_members");
 
         try {
             BufferedReader br = new BufferedReader(new FileReader(startupConfig));
             String line;
-            while((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null) {
                 startupHostsList.add(line.trim());
             }
         } catch (FileNotFoundException e) {
@@ -178,17 +173,18 @@ public class Client implements NotificationListener {
      * In order know which file version we have to compare with others
      * we read the FILE NAME, the NUMBER OF CHUNCKS and the CHUNKS I HAVE
      * at a newline delimited config file.
+     *
      * @return List of <File_Name:#Chuncks:part 1 part 2 ... part n> Strings
      */
     private ArrayList<String> parseFileVersion() {
         ArrayList<String> startupFile = new ArrayList<String>();
 
-        File startupConfig = new File("config","file_info");
+        File startupConfig = new File("config", "file_info");
 
         try {
             BufferedReader br = new BufferedReader(new FileReader(startupConfig));
             String line;
-            while((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null) {
                 startupFile.add(line.trim());
             }
         } catch (FileNotFoundException e) {
@@ -202,12 +198,11 @@ public class Client implements NotificationListener {
     }
 
 
-
-
-
     /**
      * Performs the sending of the membership list, after we have
      * incremented our own heartbeat.
+     * TODO: make it so that a random number of peers is chosen
+     * this way is faster to propagate the msg
      */
     private void sendMembershipList() {
 
@@ -215,31 +210,51 @@ public class Client implements NotificationListener {
 
         synchronized (this.memberList) {
             try {
+                //get a ramdom member from member list
+                //to send my membership Listing
                 Member member = getRandomMember();
 
-                if(member != null) {
+                if (member != null) {
+                    //prepare object to send
+                    //sending serialized object
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     ObjectOutputStream oos = new ObjectOutputStream(baos);
                     oos.writeObject(this.memberList);
                     byte[] buf = baos.toByteArray();
 
+                    // get random member adressinfo info
+                    // format IP:PORT
                     String address = member.getAddress();
                     String host = address.split(":")[0];
                     int port = Integer.parseInt(address.split(":")[1]);
 
+                    // using member adress to set Host for Datagram
                     InetAddress dest;
                     dest = InetAddress.getByName(host);
 
                     System.out.println("Sending my list to random member with IP: " + dest);
-                    System.out.println("---------------------");
+                    System.out.println("LIST SENT_____________________");
                     for (Member m : memberList) {
                         System.out.println(m);
                     }
-                    System.out.println("---------------------");
+                    System.out.println("------------------------------");
 
-                    //simulate some packet loss ~25%
-                    int percentToSend = random.nextInt(100);
-                    if(percentToSend > 25) {
+
+                    //SENDING THE MEMBERSHIP LIST TO RANDOM MEMBER
+                    // TODO: make configurable
+                    // 2 options simulate data loss or not
+                    boolean loss_option = false;
+                    if (loss_option) {
+                        // simulate some packet loss ~25%
+                        int percentToSend = random.nextInt(100);
+                        if (percentToSend > 25) {
+                            DatagramSocket socket = new DatagramSocket();
+                            DatagramPacket datagramPacket = new DatagramPacket(buf, buf.length, dest, port);
+                            socket.send(datagramPacket);
+                            socket.close();
+                        }
+                    } else {
+                        // no loss
                         DatagramSocket socket = new DatagramSocket();
                         DatagramPacket datagramPacket = new DatagramPacket(buf, buf.length, dest, port);
                         socket.send(datagramPacket);
@@ -259,31 +274,28 @@ public class Client implements NotificationListener {
      * trying 10 times if we do.  Therefore, in the case
      * where this client is the only member in the list,
      * this method will return null
+     *
      * @return Member random member if list is greater than 1, null otherwise
      */
     private Member getRandomMember() {
         Member member = null;
 
-        if(this.memberList.size() > 1) {
+        if (this.memberList.size() > 1) {
             int tries = 10;
             do {
                 int randomNeighborIndex = random.nextInt(this.memberList.size());
                 member = this.memberList.get(randomNeighborIndex);
-                if(--tries <= 0) {
+                if (--tries <= 0) {
                     member = null;
                     break;
                 }
-            } while(member.getAddress().equals(this.myAddress));
-        }
-        else {
-            System.out.println("I am alone in this world.");
+            } while (member.getAddress().equals(this.myAddress));
+        } else {
+            System.out.println(">>>>>> NO MEMBERS OTHER THAN ME FOUND <<<<<<");
         }
 
         return member;
     }
-
-
-
 
 
     /**
@@ -297,9 +309,6 @@ public class Client implements NotificationListener {
 
         }
     }
-
-
-
 
 
 
@@ -323,7 +332,7 @@ public class Client implements NotificationListener {
 
         @Override
         public void run() {
-            while(this.keepRunning.get()) {
+            while (this.keepRunning.get()) {
                 try {
                     TimeUnit.MILLISECONDS.sleep(t_gossip);
                     sendMembershipList();
@@ -345,12 +354,11 @@ public class Client implements NotificationListener {
     ///////////////////////////////////////////////////////////////////////////
 
 
-
-
     ///////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
     // INNER CLASS >> AsychronousReceiver
     ///////////////////////////////////////////////////////////////////////////
+
     /**
      * This class handles the passive cycle, where this client
      * has received an incoming message.  For now, this message
@@ -369,7 +377,7 @@ public class Client implements NotificationListener {
         @SuppressWarnings("unchecked")
         @Override
         public void run() {
-            while(keepRunning.get()) {
+            while (keepRunning.get()) {
                 try {
                     //XXX: be mindful of this array size for later
                     byte[] buf = new byte[256];
@@ -384,11 +392,11 @@ public class Client implements NotificationListener {
                     ObjectInputStream ois = new ObjectInputStream(bais);
 
                     Object readObject = ois.readObject();
-                    if(readObject instanceof ArrayList<?>) {
+                    if (readObject instanceof ArrayList<?>) {
                         ArrayList<Member> list = (ArrayList<Member>) readObject;
 
                         System.out.println("Received member list: ");
-                        System.out.println("from [" + p.getAddress() + "]" );
+                        System.out.println("from [" + p.getAddress() + "]");
                         for (Member member : list) {
                             System.out.println(member);
                         }
@@ -412,6 +420,7 @@ public class Client implements NotificationListener {
          * our list.  Also, some additional logic is needed to make sure we have
          * not timed out a member and then immediately received a list with that
          * member.
+         *
          * @param remoteList
          */
         private void mergeLists(ArrayList<Member> remoteList) {
@@ -421,33 +430,31 @@ public class Client implements NotificationListener {
                 synchronized (Client.this.memberList) {
 
                     for (Member remoteMember : remoteList) {
-                        if(Client.this.memberList.contains(remoteMember)) {
+                        if (Client.this.memberList.contains(remoteMember)) {
                             Member localMember = Client.this.memberList.get(Client.this.memberList.indexOf(remoteMember));
 
-                            if(remoteMember.getHeartbeat() > localMember.getHeartbeat()) {
+                            if (remoteMember.getHeartbeat() > localMember.getHeartbeat()) {
                                 // update local list with latest heartbeat
                                 localMember.setHeartbeat(remoteMember.getHeartbeat());
                                 // and reset the timeout of that member
                                 localMember.resetTimeoutTimer();
                             }
-                        }
-                        else {
+                        } else {
                             // the local list does not contain the remote member
 
                             // the remote member is either brand new, or a previously declared dead member
                             // if its dead, check the heartbeat because it may have come back from the dead
 
-                            if(Client.this.deadList.contains(remoteMember)) {
+                            if (Client.this.deadList.contains(remoteMember)) {
                                 Member localDeadMember = Client.this.deadList.get(Client.this.deadList.indexOf(remoteMember));
-                                if(remoteMember.getHeartbeat() > localDeadMember.getHeartbeat()) {
+                                if (remoteMember.getHeartbeat() > localDeadMember.getHeartbeat()) {
                                     // it's baa-aack
                                     Client.this.deadList.remove(localDeadMember);
                                     Member newLocalMember = new Member(remoteMember.getAddress(), remoteMember.getHeartbeat(), Client.this, t_cleanup);
                                     Client.this.memberList.add(newLocalMember);
                                     newLocalMember.startTimeoutTimer();
                                 } // else ignore
-                            }
-                            else {
+                            } else {
                                 // brand spanking new member - welcome
                                 Member newLocalMember = new Member(remoteMember.getAddress(), remoteMember.getHeartbeat(), Client.this, t_cleanup);
                                 Client.this.memberList.add(newLocalMember);
@@ -465,19 +472,17 @@ public class Client implements NotificationListener {
     ///////////////////////////////////////////////////////////////////////////
 
 
-
-
-
     /**
      * Starts the client.  Specifically, start the various cycles for this protocol.
      * Start the gossip thread and start the receiver thread.
+     *
      * @throws InterruptedException
      */
     protected void start() throws InterruptedException {
 
         // Start all timers except for me
         for (Member member : memberList) {
-            if(member != me) {
+            if (member != me) {
                 member.startTimeoutTimer();
             }
         }
@@ -495,30 +500,21 @@ public class Client implements NotificationListener {
         //  that could perform additional data synching
 
         // keep the main thread around
-        while(true) {
+        while (true) {
             TimeUnit.SECONDS.sleep(10);
         }
     }
 
 
+    public static void main(String[] args) throws InterruptedException, SocketException, UnknownHostException {
 
-
-
-
-
-
- public static void main(String[] args) throws InterruptedException, SocketException, UnknownHostException {
-
-        File_management fl = new File_management( "data" );
+        File_management fl = new File_management("data");
         fl.print_test();
-
 
 
         Client client = new Client();
         client.start();
     }
-
-
 
 
     /**
