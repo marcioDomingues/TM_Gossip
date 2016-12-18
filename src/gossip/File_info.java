@@ -11,8 +11,6 @@ public class File_info implements Serializable {
 
     private static final long serialVersionUID = 8387950590016941525L;
 
-    Member peer;
-
     String version;
 
     int number_of_blocks;
@@ -30,26 +28,11 @@ public class File_info implements Serializable {
         }
     }
 
-    public boolean wasMember(){
-        if (peer == null){
-            return false;
-        }
-        return true;
-    }
-
-    public Member getPeer() {
-        return peer;
-    }
-
-    public void setPeer(Member peer) {
-        this.peer = peer;
-    }
-
 
 
 
     public String toString(){
-        return "MEMBER: " + peer +  "\nfile version: " + version + "\n#blocks: " + number_of_blocks + "\nlist of chunks " + file_sections ;
+        return "File version: " + version + "\n#blocks: " + number_of_blocks + "\nlist of chunks " + file_sections ;
     }
 
     //TESTING

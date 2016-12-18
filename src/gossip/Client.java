@@ -210,16 +210,16 @@ public class Client implements NotificationListener {
             BufferedReader br = new BufferedReader(new FileReader(startupConfig));
             String line;
             String file_name;
-            String n_chuncks;
+            String n_chunks;
             String chunks;
             while ((line = br.readLine()) != null) {
                 line = line.trim();
                 file_name = line.split(":")[0];
-                n_chuncks = line.split(":")[1];
+                n_chunks = line.split(":")[1];
                 chunks = line.split(":")[2];
 
                 startupFile.add(file_name);
-                startupFile.add(n_chuncks);
+                startupFile.add(n_chunks);
                 startupFile.add(chunks);
             }
         } catch (FileNotFoundException e) {
