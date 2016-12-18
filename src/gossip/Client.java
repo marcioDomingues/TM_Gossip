@@ -58,7 +58,7 @@ public class Client implements NotificationListener {
 
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             public void run() {
-                System.out.println("Goodbye my friends...");
+                System.out.println(">>> I'm OUT <<<");
             }
         }));
 
@@ -66,9 +66,10 @@ public class Client implements NotificationListener {
 
         deadList = new ArrayList<Member>();
 
-        t_gossip = 1000; // 10 second TODO: make configurable
-
-        t_cleanup = 10000; // 10 seconds TODO: make configurable
+        // 10 second TODO: make configurable
+        t_gossip = 1000;
+        // 10 seconds TODO: make configurable
+        t_cleanup = 10000;
 
         random = new Random();
 
@@ -77,13 +78,12 @@ public class Client implements NotificationListener {
 
         String myIpAddress = InetAddress.getLocalHost().getHostAddress();
         this.myAddress = myIpAddress + ":" + port;
-
+        //Check my IP
         //System.out.println(">>>>" + myAddress);
 
 
+
         ArrayList<String> startupHostsList = parseStartupMembers();
-
-
 
         // loop over the initial hosts, and find ourselves
         for (String host : startupHostsList) {
@@ -100,24 +100,46 @@ public class Client implements NotificationListener {
             memberList.add(member);
         }
 
-        System.out.println("Original Member List");
+        System.out.println("---------------------");
+        System.out.println("My Stored Member List");
         System.out.println("---------------------");
 
         for (Member member : memberList) {
             System.out.println(member);
         }
 
+
+        /////////////////////////
+        //TESTING ADDED FUNCS
+        /////////////////////////
+        System.out.println("<<<<<<<<<<<<<<<<<<<<TESTING STUFF>>>>>>>>>>>>>>>>>>>>>");
+        System.out.println(parseFileVersion());
+        System.out.println(">>>>>>>>>>>>>>>>>END OFF TESTING STUFF>>>>>>>>>>>>>>>>>>>>>");
+        /////////////////////////
+        //END OF TESTING ADDED FUNCS
+        /////////////////////////
+
+
+
+        System.out.println("---------------------");
+        System.out.println("---- NOW STARTING ---");
+        System.out.println("---------------------");
+
+
+
+
         if(port != 0) {
-            // TODO: starting the server could probably be moved to the constructor
-            // of the receiver thread.
+            // TODO: starting the server could probably be moved to the constructor of the receiver thread.
             server = new DatagramSocket(port);
         }
         else {
             // This is bad, so no need proceeding on
-            System.err.println("Could not find myself in startup list");
+            System.err.println("Could not find myself in startup list >> my IP is: " + myAddress);
             System.exit(-1);
         }
     }
+
+
 
     /**
      * In order to have some membership lists at startup, we read the IP addresses
@@ -144,6 +166,37 @@ public class Client implements NotificationListener {
         }
         return startupHostsList;
     }
+
+
+    /**
+     * In order know which file version we have to compare with others
+     * we read the FILE NAME, the NUMBER OF CHUNCKS and the CHUNKS I HAVE
+     * at a newline delimited config file.
+     * @return List of <File_Name:#Chuncks:part 1 part 2 ... part n> Strings
+     */
+    private ArrayList<String> parseFileVersion() {
+        ArrayList<String> startupFile = new ArrayList<String>();
+
+        File startupConfig = new File("config","file_info");
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(startupConfig));
+            String line;
+            while((line = br.readLine()) != null) {
+                startupFile.add(line.trim());
+            }
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return startupFile;
+    }
+
+
+
 
     /**
      * Performs the sending of the membership list, after we have
