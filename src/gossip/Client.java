@@ -33,8 +33,10 @@ public class Client implements NotificationListener {
 
     private ArrayList<Member> deadList;
 
+    //time interval for sending gossip msg
     private int t_gossip; //in ms
 
+    //time until declaring a member dead
     public int t_cleanup; //in ms
 
     private Random random;
@@ -45,6 +47,8 @@ public class Client implements NotificationListener {
 
     private Member me;
 
+
+    private ArrayList<String> fileInfoList;
 
 
 
@@ -66,9 +70,11 @@ public class Client implements NotificationListener {
 
         deadList = new ArrayList<Member>();
 
-        // 10 second TODO: make configurable
+        //time interval for sending gossip msg
+        // 1 second TODO: make configurable
         t_gossip = 1000;
         // 10 seconds TODO: make configurable
+        //time until declaring a member dead
         t_cleanup = 10000;
 
         random = new Random();
@@ -198,6 +204,7 @@ public class Client implements NotificationListener {
 
 
 
+
     /**
      * Performs the sending of the membership list, after we have
      * incremented our own heartbeat.
@@ -223,7 +230,7 @@ public class Client implements NotificationListener {
                     InetAddress dest;
                     dest = InetAddress.getByName(host);
 
-                    System.out.println("Sending to " + dest);
+                    System.out.println("Sending my list to random member with IP: " + dest);
                     System.out.println("---------------------");
                     for (Member m : memberList) {
                         System.out.println(m);
@@ -245,8 +252,6 @@ public class Client implements NotificationListener {
             }
         }
     }
-
-
 
     /**
      * Find a random peer from the local membership list.
@@ -276,6 +281,26 @@ public class Client implements NotificationListener {
 
         return member;
     }
+
+
+
+
+
+    /**
+     * Performs the sending of the file version, after we have
+     * incremented our own heartbeat.
+     * TODO this should also have more info about file and people who as it
+     */
+    private void sendFileVersionInfo() {
+
+        synchronized (this.fileInfoList) {
+
+        }
+    }
+
+
+
+
 
 
     ///////////////////////////////////////////////////////////////////////////

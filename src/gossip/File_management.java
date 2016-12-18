@@ -8,12 +8,22 @@ import java.util.ArrayList;
  */
 public class File_management {
 
-
     String version = new String();
     int number_of_blocks;
     ArrayList<String> file_sections = new ArrayList<String>();
 
     public File_management( String folder ) {
+        getInfoFromFile( folder );
+    }
+
+
+
+
+    public void print_test(){
+        System.out.println( "to transfer > file version_ " + version + " n# blocks_ " + number_of_blocks + " list of f names " + file_sections.toString()  );
+    }
+
+    public void getInfoFromFile( String folder ){
         File dir_ = new File( folder );
         File[] cont_ = dir_.listFiles();
 
@@ -30,15 +40,7 @@ public class File_management {
             };
             number_of_blocks = i;
         }
-
     }
-
-    public void print_test(){
-
-        System.out.println( "to transfer > file version_ " + version + " n# blocks_ " + number_of_blocks + " list of f names " + file_sections.toString()  );
-
-    }
-
 
     //File startupConfig = new File("config","startup_members");
 
