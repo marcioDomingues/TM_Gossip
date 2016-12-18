@@ -32,8 +32,6 @@ public class Client implements NotificationListener {
     private ArrayList<Member> deadList;
 
 
-    private ArrayList<File_info> peersList;
-
     // time interval for sending gossip msg
     // used in MembershipGossiper
     private int t_gossip; //in ms
@@ -50,8 +48,6 @@ public class Client implements NotificationListener {
 
     private Member me;
 
-
-    private ArrayList<String> fileInfoList;
 
 
     /**
@@ -73,7 +69,6 @@ public class Client implements NotificationListener {
 
         deadList = new ArrayList<Member>();
 
-        peersList = new ArrayList<File_info>();
 
         //time interval for sending gossip msg
         // 1 second TODO: make configurable
@@ -111,8 +106,7 @@ public class Client implements NotificationListener {
                 //create a file info for the only i know at this time
                 //add it to peer list
                 file_info = new File_info(parseFileVersion());
-                file_info.setPeer(me);
-                peersList.add(file_info);
+                me.setF_i(file_info);
                 //////////////////////////////////////////////////////
 
                 System.out.println("ME >> " + me);
@@ -138,8 +132,6 @@ public class Client implements NotificationListener {
         //System.out.println(parseFileVersion());
         File_info n = new File_info(parseFileVersion());
         System.out.println(n);
-        System.out.println("PEERS LIST");
-        System.out.println(peersList);
         System.out.println(">>>>>>>>>>>>>>>>>END OFF TESTING STUFF>>>>>>>>>>>>>>>>>>>>>");
         /////////////////////////
         //END OF TESTING ADDED FUNCS

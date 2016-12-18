@@ -17,6 +17,7 @@ public class Member implements Serializable {
 
     private transient TimeoutTimer timeoutTimer;
 
+    private File_info f_i;
 
 
     public Member(String address, int heartbeat, Client client, int t_cleanup) {
@@ -24,7 +25,6 @@ public class Member implements Serializable {
         this.heartbeat = heartbeat;
         this.timeoutTimer = new TimeoutTimer(t_cleanup, client, this);
     }
-
 
 
     public void startTimeoutTimer() {
@@ -47,9 +47,25 @@ public class Member implements Serializable {
         this.heartbeat = heartbeat;
     }
 
+
+    public boolean wasFile_info (){
+        return f_i!=null ? true : false;
+    }
+
+    public File_info getF_i() {
+        return f_i;
+    }
+
+    public void setF_i(File_info f_i) {
+        this.f_i = f_i;
+    }
+
+
+
+
     @Override
     public String toString() {
-        return "Member [address=" + address + ", heartbeat=" + heartbeat + "]";
+        return "Member [address=" + address + ", heartbeat=" + heartbeat + "]" +"|"+ "[" + f_i + "]";
     }
 
 
