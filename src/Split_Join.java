@@ -1,10 +1,11 @@
 /**
  * TechPaste.com . 2010
+ *
  * @author Rks(rks2286(at)gmail(dot)com
  * Modified To Split a File before Upload.
  * from
  * http://www.techpaste.com/2011/08/advanced-java-program-split-join-file-upload-size-slices/
- *
+ * <p>
  * GNU License. The program can be redistributed and modified keeping the author credit intact.
  */
 
@@ -26,6 +27,13 @@ public class Split_Join {
 //        long mBbytefileSize = bytefileSize * 1024 * 1024;
 //        System.out.println("ByteFileSize" + mBbytefileSize);
 
+
+
+        ///////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////
+        // COMMAND LINE CLIENT HELPER
+        ///////////////////////////////////////////////////////////////////////////
+
 //Checking the presents of argument.
         if (args.length == 0) {
             System.out.println("Type -h for getting help on this splitter");
@@ -43,9 +51,7 @@ public class Split_Join {
             else if (args[0].equals("-s") || args[0].equals("-j")) {
                 System.out.println("Parameters missing, type -h for help.....");
             }
-        }
-        else if((args.length == 3) && args[2].startsWith("-"))
-        {
+        } else if ((args.length == 3) && args[2].startsWith("-")) {
 
             System.out.println("A Negative(-) Value For The Split File Size Not Allowed.");
             System.out.println("Type \"Splitme -h\" for Help!");
@@ -57,7 +63,7 @@ public class Split_Join {
                 String FilePath = "";
                 FilePath = args[1];
                 File filename = new File(FilePath);
-                long splitFileSize = 0,bytefileSize=0;
+                long splitFileSize = 0, bytefileSize = 0;
                 if (filename.exists()) {
                     try {
                         bytefileSize = Long.parseLong(args[2]);
@@ -104,6 +110,18 @@ public class Split_Join {
         System.out.println();
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+    // END OFF COMMAND LINE CLIENT HELPER
+    ///////////////////////////////////////////////////////////////////////////
+
+
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+    // JOIN FUNCTION
+    ///////////////////////////////////////////////////////////////////////////
     public void join(String FilePath) {
         long leninfile = 0, leng = 0;
         int count = 1, data = 0;
@@ -134,7 +152,13 @@ public class Split_Join {
             e.printStackTrace();
         }
     }
+    // END OFF JOIN FUNCTION
+    ///////////////////////////////////////////////////////////////////////////
 
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+    // SPLIT FUNCTION
+    ///////////////////////////////////////////////////////////////////////////
     public void split(String FilePath, long splitlen) {
         long leninfile = 0, leng = 0;
         int count = 1, data;
@@ -161,4 +185,6 @@ public class Split_Join {
             e.printStackTrace();
         }
     }
+    // END OFF SPLIT FUNCTION
+    ///////////////////////////////////////////////////////////////////////////
 }

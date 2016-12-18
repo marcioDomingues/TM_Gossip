@@ -24,6 +24,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.management.Notification;
 import javax.management.NotificationListener;
 
+
+
+
 public class Client implements NotificationListener {
 
     private ArrayList<Member> memberList;
@@ -41,6 +44,9 @@ public class Client implements NotificationListener {
     private String myAddress;
 
     private Member me;
+
+
+
 
     /**
      * Setup the client's lists, gossiping parameters, and parse the startup config file.
@@ -187,6 +193,8 @@ public class Client implements NotificationListener {
         }
     }
 
+
+
     /**
      * Find a random peer from the local membership list.
      * Ensure that we do not select ourselves, and keep
@@ -216,6 +224,11 @@ public class Client implements NotificationListener {
         return member;
     }
 
+
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+    // INNER CLASS >> MembershipGossiper
+    ///////////////////////////////////////////////////////////////////////////
     /**
      * The class handles gossiping the membership list.
      * This information is important to maintaining a common
@@ -248,7 +261,18 @@ public class Client implements NotificationListener {
         }
 
     }
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+    // END OFF INNER CLASS >> MembershipGossiper
+    ///////////////////////////////////////////////////////////////////////////
 
+
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+    // INNER CLASS >> AsychronousReceiver
+    ///////////////////////////////////////////////////////////////////////////
     /**
      * This class handles the passive cycle, where this client
      * has received an incoming message.  For now, this message
@@ -357,6 +381,14 @@ public class Client implements NotificationListener {
             }
         }
     }
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+    // END OFF INNER CLASS >> AsychronousReceiver
+    ///////////////////////////////////////////////////////////////////////////
+
+
+
+
 
     /**
      * Starts the client.  Specifically, start the various cycles for this protocol.
@@ -393,6 +425,10 @@ public class Client implements NotificationListener {
 
 
 
+
+
+
+
  public static void main(String[] args) throws InterruptedException, SocketException, UnknownHostException {
 
         File_management fl = new File_management( "data" );
@@ -403,6 +439,7 @@ public class Client implements NotificationListener {
         Client client = new Client();
         client.start();
     }
+
 
 
 
