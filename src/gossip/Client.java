@@ -463,7 +463,7 @@ public class Client implements NotificationListener {
          * our list.  Also, some additional logic is needed to make sure we have
          * not timed out a member and then immediately received a list with that
          * member.
-         *
+         * REVIEW: how to merge when version received is bigger. Have to keep a list of peers to download
          * @param remoteList
          */
         private void mergeLists(ArrayList<Member> remoteList) {
@@ -575,10 +575,6 @@ public class Client implements NotificationListener {
 
 
     public static void main(String[] args) throws InterruptedException, SocketException, UnknownHostException {
-
-        //File_info fl = new File_info("data");
-        //fl.print_test();
-
 
         Client client = new Client();
         client.start();

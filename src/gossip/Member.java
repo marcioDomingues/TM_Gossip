@@ -48,18 +48,11 @@ public class Member implements Serializable {
     }
 
 
-    public boolean wasFile_info (){
-        return f_i!=null ? true : false;
-    }
+    public boolean wasFile_info (){ return f_i!=null ? true : false; }
 
-    public File_info getF_i() {
-        return f_i;
-    }
+    public File_info getF_i() { return f_i; }
 
-    public void setF_i(File_info f_i) {
-        this.f_i = f_i;
-    }
-
+    public void setF_i(File_info f_i) { this.f_i = f_i; }
 
 
 
