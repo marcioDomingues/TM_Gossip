@@ -11,15 +11,17 @@ public class File_info implements Serializable {
 
     private static final long serialVersionUID = 8387950590016941525L;
 
-    String version;
+    //REVIEW: use timestamp
+    int version;
 
     int number_of_blocks;
 
     ArrayList<String> file_sections = new ArrayList<String>();
 
+
     public File_info( ArrayList<String> f ) {
 
-        this.version= f.get(0);
+        this.version= Integer.parseInt(f.get(0));
         this.number_of_blocks= Integer.parseInt(f.get(1));
 
         String[] n_section = f.get(2).split(" ");
@@ -29,9 +31,34 @@ public class File_info implements Serializable {
     }
 
 
-
-
     public String toString(){
+        return "version=" + version + ", #blocks=" + number_of_blocks + ", chunkList=" + file_sections ;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        File_info file_info = (File_info) o;
+
+        if (version != file_info.version) return false;
+        if (number_of_blocks != file_info.number_of_blocks) return false;
+        return file_sections != null ? file_sections.equals(file_info.file_sections) : file_info.file_sections == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = version;
+        result = 31 * result + number_of_blocks;
+        result = 31 * result + (file_sections != null ? file_sections.hashCode() : 0);
+        return result;
+    }
+
+    /////////////////////////////////////////////
+    //TESTING
+    public String printTeste(){
         return "File version: " + version + "\n#blocks: " + number_of_blocks + "\nlist of chunks " + file_sections ;
     }
 
@@ -41,7 +68,7 @@ public class File_info implements Serializable {
         File[] cont_ = dir_.listFiles();
 
         File dir_sub=cont_[cont_.length - 1];
-        version = dir_sub.getName();
+        version = Integer.parseInt( dir_sub.getName() );
 
         if ( dir_sub!=null && dir_sub.isDirectory() ){
             File[] cont_sub = dir_sub.listFiles();
@@ -54,6 +81,8 @@ public class File_info implements Serializable {
             number_of_blocks = i;
         }
     }
+
+
 
     //File startupConfig = new File("config","startup_members");
 

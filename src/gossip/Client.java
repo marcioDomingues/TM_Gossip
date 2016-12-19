@@ -31,6 +31,7 @@ public class Client implements NotificationListener {
 
     private ArrayList<Member> deadList;
 
+    private ArrayList<Member> oldVersionMembersList;
 
     // time interval for sending gossip msg
     // used in MembershipGossiper
@@ -68,6 +69,8 @@ public class Client implements NotificationListener {
         memberList = new ArrayList<Member>();
 
         deadList = new ArrayList<Member>();
+
+        oldVersionMembersList = new ArrayList<Member>();
 
 
         //time interval for sending gossip msg
@@ -229,7 +232,7 @@ public class Client implements NotificationListener {
      * Performs the sending of the membership list, after we have
      * incremented our own heartbeat.
      * * **************************************************************************
-     * REVIEW: define a FANOUT make it so that a random number of peers is chosen
+     * REVIEW: define a FANOUT make it so that a random number of Members is chosen
      * this way is faster to propagate the msg
      * REVIEW: define a A MAXIMUM NUMBER OF NODES PER MEMBER_LIST
      * or else everyone will have a list with the whole network of peers
@@ -240,9 +243,21 @@ public class Client implements NotificationListener {
 
         synchronized (this.memberList) {
             try {
-                //get a random member from member list
-                //to send my membership Listing
-                Member member = getRandomMember();
+                Member member;
+                //get a priority member first
+                // if a member in the oldVersionMembersList exists i should send him my list
+                //remove right away it has to be the one that is late to deal with synch
+                if ( oldVersionMembersList.isEmpty() ){
+                    //get a random member from member list
+                    //to send my membership Listing
+                    member = getRandomMember();
+                }else{
+                    //get the last of list
+                    int nth = oldVersionMembersList.size()-1;
+                    member = oldVersionMembersList.get( nth );
+                    oldVersionMembersList.remove(nth);
+
+                }
 
                 if (member != null) {
                     //prepare object to send
@@ -400,6 +415,7 @@ public class Client implements NotificationListener {
             while (keepRunning.get()) {
                 try {
                     //TODO XXX: be mindful of this array size for later
+                    //the size should be sent first
                     byte[] buf = new byte[256];
 
                     DatagramPacket p = new DatagramPacket(buf, buf.length);
@@ -407,7 +423,6 @@ public class Client implements NotificationListener {
 
                     // extract the member arraylist out of the packet
                     // TODO: maybe abstract this out to pass just the bytes needed
-
                     ByteArrayInputStream bais = new ByteArrayInputStream(p.getData());
                     ObjectInputStream ois = new ObjectInputStream(bais);
 
@@ -420,8 +435,16 @@ public class Client implements NotificationListener {
                         for (Member member : list) {
                             System.out.println(member);
                         }
+
+                        //this will be checking versions
+                        checkNewVersionInList(list);
+
+
+
+
                         // Merge our list with the one we just received
                         mergeLists(list);
+
                     }
 
                 } catch (IOException e) {
@@ -481,6 +504,29 @@ public class Client implements NotificationListener {
                                 newLocalMember.startTimeoutTimer();
                             }
                         }
+                    }
+                }
+            }
+        }
+
+        /**
+         * Check if a newly received list as a new file version
+         * REVIEW: for now is just printing if found, later add start download new file
+         */
+        private void checkNewVersionInList(ArrayList<Member> remoteList) {
+            int myVersion = Client.this.me.getF_i().version;
+            int receivedVersion;
+
+            for( Member m : remoteList){
+                receivedVersion = m.getF_i().version;
+                if ( myVersion != receivedVersion){
+                    System.out.println( "Version diferent from: " + m.getAddress() );
+                    if( myVersion < receivedVersion ){
+                        System.out.println( "MY VERSION IS SMALLER" );
+                        System.out.println( "TODO: have co call the method to start updating my version" );
+                    }else{
+                        System.out.println( "MY VERSION IS BIGGER" );
+                        System.out.println( "TODO: add this member to the list of Member to be notified");
                     }
                 }
             }
