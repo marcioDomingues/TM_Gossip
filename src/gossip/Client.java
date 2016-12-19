@@ -33,6 +33,8 @@ public class Client implements NotificationListener {
 
     private ArrayList<Member> oldVersionMembersList;
 
+    private ArrayList<Member> newVersionsMembersList;
+
     // time interval for sending gossip msg
     // used in MembershipGossiper
     private int t_gossip; //in ms
@@ -72,6 +74,7 @@ public class Client implements NotificationListener {
 
         oldVersionMembersList = new ArrayList<Member>();
 
+        newVersionsMembersList = new ArrayList<Member>();
 
         //time interval for sending gossip msg
         // 1 second TODO: make configurable
@@ -524,9 +527,11 @@ public class Client implements NotificationListener {
                     if( myVersion < receivedVersion ){
                         System.out.println( "MY VERSION IS SMALLER" );
                         System.out.println( "TODO: have co call the method to start updating my version" );
+                        newVersionsMembersList.add(m);
                     }else{
                         System.out.println( "MY VERSION IS BIGGER" );
                         System.out.println( "TODO: add this member to the list of Member to be notified");
+                        oldVersionMembersList.add(m);
                     }
                 }
             }
